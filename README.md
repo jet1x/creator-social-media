@@ -28,23 +28,30 @@ Most social media skills write posts. CropProof also **checks** them, with real 
 
 Requirements: [Claude Code](https://claude.com/claude-code), Node.js ≥ 20, git.
 
-**macOS / Linux**
+The skill lives in [`.claude/skills/cropproof`](.claude/skills/cropproof). Skill URL for importers:
+`https://github.com/jet1x/CropProof/tree/main/.claude/skills/cropproof`
+
+**macOS / Linux** — install for all your projects
 ```bash
-git clone https://github.com/jet1x/CropProof.git ~/.claude/skills/cropproof
+git clone https://github.com/jet1x/CropProof.git
+mkdir -p ~/.claude/skills && cp -r CropProof/.claude/skills/cropproof ~/.claude/skills/
 cd ~/.claude/skills/cropproof/tools
 npm install && npm run setup && npm test
 ```
 
-**Windows (PowerShell)**
+**Windows (PowerShell)** — install for all your projects
 ```powershell
-git clone https://github.com/jet1x/CropProof.git "$HOME\.claude\skills\cropproof"
+git clone https://github.com/jet1x/CropProof.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
+Copy-Item -Recurse CropProof\.claude\skills\cropproof "$HOME\.claude\skills\"
 cd "$HOME\.claude\skills\cropproof\tools"
 npm install; npm run setup; npm test
 ```
 
+**One project only:** copy `.claude/skills/cropproof` into `<your-project>/.claude/skills/`, then run the same `npm` commands in its `tools/` folder.
+
 - `npm run setup` downloads the headless Chromium used for measuring HTML designs.
 - `npm test` runs the self-test (9 checks: correct assets must pass, deliberately broken ones must fail).
-- To use it in one project only, clone into `<project>/.claude/skills/cropproof` instead.
 - The tools use `sharp`, `playwright` and `ffmpeg-static` (~110 MB in `tools/node_modules`). If your npm blocks install scripts and ffmpeg is missing, run `npm rebuild ffmpeg-static`, or set `FFMPEG_PATH` to your own ffmpeg.
 
 ## Use
@@ -63,7 +70,7 @@ Claude will: identify platforms and placements → verify specs → design → *
 
 ## Tools
 
-Run from `tools/` (Claude runs them for you; you can too):
+Run from `.claude/skills/cropproof/tools/` (Claude runs them for you; you can too):
 
 | Command | What it does |
 |---|---|
@@ -101,11 +108,13 @@ Every tool prints ✓ / ⚠ / ✗ and `RESULT: PASS | FAIL` (exit code 1 on FAIL
 ## What's inside
 
 ```
-SKILL.md            the protocol + workflow + checklist (always loaded with the skill)
-platform-specs.md   dimensions, safe zones, covers, video QC, previews, no-guessing policy
-copywriting.md      platform-specific captions & hashtags, human tone, CTA rules
-file-size.md        size targets and the compression method
-tools/              measuring & compression tools, presets, self-test
+.claude/skills/cropproof/
+├── SKILL.md            the protocol + workflow + checklist (loaded with the skill)
+├── platform-specs.md   dimensions, safe zones, covers, video QC, previews, no-guessing policy
+├── copywriting.md      platform-specific captions & hashtags, human tone, CTA rules
+├── file-size.md        size targets and the compression method
+└── tools/              measuring & compression tools, presets, self-test
+assets/                 README images
 ```
 
 ## Example
