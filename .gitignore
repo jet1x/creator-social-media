@@ -1,0 +1,7 @@
+node_modules/
+_qc/
+*-small.jpg
+*-small.png
+*-small.mp4
+.DS_Store
+Thumbs.db

@@ -1,0 +1,18 @@
+{
+  "name": "cropproof-tools",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Measured QA + compression tools for the CropProof social media skill",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "setup": "npx playwright install chromium",
+    "test": "node test/run-tests.mjs"
+  },
+  "dependencies": {
+    "ffmpeg-static": "5.2.0",
+    "playwright": "1.56.1",
+    "sharp": "0.34.4"
+  }
+}

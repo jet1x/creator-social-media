@@ -1,0 +1,108 @@
+{
+  "_note": "Pixel zones are for the canvas size given. 'safe' = where protected elements (text, logos, CTAs, faces, products) may go. 'crops' = how the platform crops the asset in other views (profile grid / feed). 'avoid' = UI overlays that cover the asset. tested=true: used and checked in real productions. tested=false: approximate — verify against official docs and tell the user the value is unverified. Last reviewed: 2026-11.",
+
+  "reel-9x16": {
+    "label": "Vertical video: TikTok / Instagram Reels / Facebook Reels / YouTube Shorts",
+    "w": 1080, "h": 1920, "tested": true,
+    "safe": { "x0": 60, "x1": 1020, "y0": 200, "y1": 1460 },
+    "avoid": [
+      { "name": "right action column (like/comment/share)", "x0": 940, "y0": 880, "x1": 1080, "y1": 1920 },
+      { "name": "top bar (tabs/search)", "x0": 0, "y0": 0, "x1": 1080, "y1": 200 },
+      { "name": "bottom caption/music/username", "x0": 0, "y0": 1460, "x1": 1080, "y1": 1920 }
+    ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "cover-9x16": {
+    "label": "Reel / TikTok / Facebook Reel cover (thumbnail)",
+    "w": 1080, "h": 1920, "tested": true,
+    "safe": { "x0": 30, "x1": 1050, "y0": 290, "y1": 1620 },
+    "crops": [
+      { "name": "Instagram & TikTok profile grid 3:4", "x": 0, "y": 240, "w": 1080, "h": 1440 },
+      { "name": "Facebook/Instagram feed 4:5", "x": 0, "y": 285, "w": 1080, "h": 1350 }
+    ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "story-9x16": {
+    "label": "Instagram / Facebook Story",
+    "w": 1080, "h": 1920, "tested": true,
+    "safe": { "x0": 60, "x1": 1020, "y0": 250, "y1": 1580 },
+    "avoid": [
+      { "name": "top: progress bar + account name", "x0": 0, "y0": 0, "x1": 1080, "y1": 250 },
+      { "name": "bottom: reply field / stickers", "x0": 0, "y0": 1580, "x1": 1080, "y1": 1920 }
+    ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 },
+    "video": { "fps": [30], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "ig-feed-3x4": {
+    "label": "Instagram feed 3:4 (fills the profile grid tile exactly)",
+    "w": 1080, "h": 1440, "tested": true,
+    "safe": { "x0": 70, "x1": 1010, "y0": 70, "y1": 1370 },
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "ig-feed-4x5": {
+    "label": "Instagram / Facebook feed portrait",
+    "w": 1080, "h": 1350, "tested": true,
+    "safe": { "x0": 70, "x1": 1010, "y0": 60, "y1": 1290 },
+    "crops": [ { "name": "Instagram profile grid 3:4", "x": 34, "y": 0, "w": 1012, "h": 1350 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "ig-feed-1x1": {
+    "label": "Instagram / Facebook feed square",
+    "w": 1080, "h": 1080, "tested": true,
+    "safe": { "x0": 165, "x1": 915, "y0": 60, "y1": 1020 },
+    "crops": [ { "name": "Instagram profile grid 3:4 (cuts the sides!)", "x": 135, "y": 0, "w": 810, "h": 1080 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "yt-thumbnail": {
+    "label": "YouTube thumbnail",
+    "w": 1280, "h": 720, "tested": true,
+    "safe": { "x0": 40, "x1": 1240, "y0": 40, "y1": 680 },
+    "avoid": [ { "name": "duration badge", "x0": 1100, "y0": 640, "x1": 1280, "y1": 720 } ],
+    "image": { "maxKB": 1024, "hardMaxKB": 2048 }
+  },
+
+  "yt-banner": {
+    "label": "YouTube channel banner (official safe area 1546×423)",
+    "w": 2560, "h": 1440, "tested": true,
+    "safe": { "x0": 507, "x1": 2053, "y0": 508, "y1": 931 },
+    "crops": [
+      { "name": "TV (full)", "x": 0, "y": 0, "w": 2560, "h": 1440 },
+      { "name": "desktop (max width)", "x": 0, "y": 508, "w": 2560, "h": 423 },
+      { "name": "mobile / min safe", "x": 507, "y": 508, "w": 1546, "h": 423 }
+    ],
+    "image": { "maxKB": 2048, "hardMaxKB": 6144 }
+  },
+
+  "fb-page-cover": {
+    "label": "Facebook Page cover (desktop vs mobile crop differ)",
+    "w": 1640, "h": 624, "tested": false,
+    "safe": { "x0": 250, "x1": 1390, "y0": 90, "y1": 534 },
+    "crops": [
+      { "name": "desktop (approx.)", "x": 0, "y": 0, "w": 1640, "h": 624 },
+      { "name": "mobile (approx., sides cut)", "x": 250, "y": 0, "w": 1140, "h": 624 }
+    ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "linkedin-banner": {
+    "label": "LinkedIn personal profile banner (profile photo overlaps bottom-left)",
+    "w": 1584, "h": 396, "tested": false,
+    "safe": { "x0": 420, "x1": 1500, "y0": 40, "y1": 356 },
+    "avoid": [ { "name": "profile photo (desktop, approx.)", "x0": 0, "y0": 170, "x1": 420, "y1": 396 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "x-header": {
+    "label": "X (Twitter) header",
+    "w": 1500, "h": 500, "tested": false,
+    "safe": { "x0": 60, "x1": 1440, "y0": 60, "y1": 360 },
+    "avoid": [ { "name": "profile photo (approx.)", "x0": 0, "y0": 300, "x1": 420, "y1": 500 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  }
+}
