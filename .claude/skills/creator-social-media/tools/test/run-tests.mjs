@@ -17,7 +17,7 @@ function run(name, tool, argv, expect) {
   const res = spawnSync(process.execPath, [path.join(TOOLS, tool), ...argv], { encoding: 'utf8' })
   const out = res.stdout + res.stderr
   const pass = /RESULT: PASS/.test(out)
-  const okResult = expect.result === 'PASS' ? pass : /RESULT: FAIL/.test(out)
+  const okResult = expect.result === 'PASS' ? pass : expect.result === 'ERROR' ? res.status !== 0 && !pass : /RESULT: FAIL/.test(out)
   const missing = (expect.contains ?? []).filter((s) => !out.includes(s))
   const ok = okResult && !missing.length
   console.log(`${ok ? '✓' : '✗'} ${name}`)
@@ -45,12 +45,25 @@ run('check-image: compressed image passes', 'check-image.mjs', [path.join(TMP, '
 const wrong = path.join(TMP, 'wrong.jpg')
 await sharp({ create: { width: 1080, height: 1080, channels: 3, background: '#333' } }).jpeg().toFile(wrong)
 run('check-image: wrong dimensions are caught', 'check-image.mjs', [wrong, '--preset', 'cover-9x16'], { result: 'FAIL', contains: ['required 1080×1920'] })
+const thumb = path.join(TMP, 'thumb.jpg')
+await sharp({ create: { width: 1920, height: 1080, channels: 3, background: '#24324a' } }).jpeg().toFile(thumb)
+run('check-image: --size scales a preset to a same-ratio canvas', 'check-image.mjs', [thumb, '--preset', 'yt-thumbnail', '--size', '1920x1080'], { result: 'PASS', contains: ['Dimensions 1920×1080'] })
+run('check-image: --size with a different aspect ratio is refused', 'check-image.mjs', [thumb, '--preset', 'yt-thumbnail', '--size', '1080x1080'], { result: 'ERROR', contains: ['different aspect ratio'] })
+
+// --- overlays ---
+const ovDir = path.join(TMP, 'overlays')
+run('make-overlays: five transparent 1080×1920 platform overlays', 'make-overlays.mjs', ['--out', ovDir], { result: 'PASS', contains: ['TikTok', 'Instagram Reels', 'Facebook Reels', 'LinkedIn vertical video', 'YouTube Shorts'] })
 
 // --- video ---
 const vid = path.join(TMP, 'reel.mp4')
 spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=0x2a5a3a:s=1080x1920:d=2:r=30', '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000',
-  '-shortest', '-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-movflags', '+faststart', vid])
-run('check-video: correct reel passes', 'check-video.mjs', [vid, '--preset', 'reel-9x16'], { result: 'PASS' })
+  '-shortest', '-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-c:a', 'aac', '-movflags', '+faststart', vid])
+run('check-video: correct reel passes', 'check-video.mjs', [vid, '--preset', 'reel-9x16'], { result: 'PASS', contains: ['SDR Rec.709', 'Square pixels', 'Progressive scan'] })
+run('check-video: platform preset (TikTok) is checked and flagged as estimated', 'check-video.mjs', [vid, '--preset', 'tiktok-9x16'], { result: 'PASS', contains: ['NOT verified'] })
+const sar = path.join(TMP, 'sar.mp4')
+spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=0x2a5a3a:s=1080x1920:d=1:r=30', '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000',
+  '-shortest', '-vf', 'setsar=2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-movflags', '+faststart', sar])
+run('check-video: non-square pixels are caught', 'check-video.mjs', [sar, '--preset', 'reel-9x16'], { result: 'FAIL', contains: ['SAR 2:1'] })
 const flash = path.join(TMP, 'flash.mp4')
 spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=0x2a5a3a:s=1080x1920:d=1:r=30', '-f', 'lavfi', '-i', 'color=c=white:s=1080x1920:d=1:r=30',
   '-filter_complex', '[0][1]concat=n=2:v=1[v]', '-map', '[v]', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', flash])

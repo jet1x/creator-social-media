@@ -27,11 +27,28 @@ export function args(argv = process.argv.slice(2)) {
 }
 
 const presetNames = () => Object.keys(SPECS).filter((k) => !k.startsWith('_')).join(', ')
-export function preset(name) {
+/**
+ * Loads a preset. With `size` ("WxH", e.g. from --size 3840x2160) every zone and crop is scaled
+ * proportionally to that canvas — only allowed when the aspect ratio matches (±0.5%).
+ */
+export function preset(name, size) {
   if (!name || name === true) throw new Error(`Missing --preset. Available: ${presetNames()}`)
   const p = SPECS[name]
   if (!p) throw new Error(`Unknown preset "${name}". Available: ${presetNames()}`)
-  return { name, ...p }
+  const out = structuredClone({ name, ...p })
+  if (!size || size === true) return out
+  const m = /^(\d+)\s*[x×]\s*(\d+)$/i.exec(String(size))
+  if (!m) throw new Error(`--size must look like 3840x2160 (got "${size}")`)
+  const w = +m[1], h = +m[2]
+  if (Math.abs(w / h - p.w / p.h) / (p.w / p.h) > 0.005) throw new Error(`--size ${w}×${h} has a different aspect ratio than "${name}" (${p.w}×${p.h}) — use a matching preset or redesign`)
+  const sx = w / p.w, sy = h / p.h
+  const zone = (z) => ({ ...z, x0: Math.round(z.x0 * sx), x1: Math.round(z.x1 * sx), y0: Math.round(z.y0 * sy), y1: Math.round(z.y1 * sy) })
+  out.w = w; out.h = h
+  out.safe = zone(p.safe)
+  if (p.avoid) out.avoid = p.avoid.map(zone)
+  if (p.crops) out.crops = p.crops.map((c) => ({ ...c, x: Math.round(c.x * sx), y: Math.round(c.y * sy), w: Math.round(c.w * sx), h: Math.round(c.h * sy) }))
+  out.label = `${p.label} — scaled to ${w}×${h}`
+  return out
 }
 
 /** Collects check results → PASS / PASS (with warnings) / FAIL. Sets exit code 1 on FAIL. */

@@ -1,5 +1,5 @@
 // Image check (post / cover / story / banner / thumbnail).
-//   node check-image.mjs <image> --preset <name> [--max-kb N]
+//   node check-image.mjs <image> --preset <name> [--size WxH] [--max-kb N]
 // Checks: exact dimensions, format, colour space, file size.
 // Writes: _qc/<name>-qc.png = full asset with safe zones + every platform crop (for visual review).
 // Note: text POSITION is only measured for HTML designs (check-html.mjs). For a finished image, review the sheet.
@@ -9,8 +9,8 @@ import { args, preset, report, sharp, qcDir, qcSheet, fmtSize } from './lib.mjs'
 
 const a = args()
 const file = a._[0]
-if (!file) { console.log('Usage: node check-image.mjs <image> --preset <name> [--max-kb N]'); process.exit(2) }
-const p = preset(a.preset)
+if (!file) { console.log('Usage: node check-image.mjs <image> --preset <name> [--size WxH] [--max-kb N]'); process.exit(2) }
+const p = preset(a.preset, a.size)
 const r = report(`Image: ${path.basename(file)} → ${p.label}`)
 
 const meta = await sharp(file).metadata()

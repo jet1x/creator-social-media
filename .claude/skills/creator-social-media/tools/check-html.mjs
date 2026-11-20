@@ -1,5 +1,5 @@
 // MEASURES the position of text/logos/CTAs in a design built as HTML (static or animated).
-//   node check-html.mjs <file.html | http://...> --preset <name> [--step 0.1] [--selector "css"]
+//   node check-html.mjs <file.html | http://...> --preset <name> [--size WxH] [--step 0.1] [--selector "css"]
 //
 // For every protected element (and at every time sample, if animated) it checks:
 //   • inside the preset's safe zone      • not over platform UI zones ("avoid")
@@ -18,8 +18,8 @@ import { args, preset, report, area, inter, zoneRect, qcDir, qcSheet } from './l
 const { chromium } = createRequire(import.meta.url)('playwright')
 const a = args()
 const target = a._[0]
-if (!target) { console.log('Usage: node check-html.mjs <file.html|url> --preset <name> [--step 0.1] [--selector "css"]'); process.exit(2) }
-const p = preset(a.preset)
+if (!target) { console.log('Usage: node check-html.mjs <file.html|url> --preset <name> [--size WxH] [--step 0.1] [--selector "css"]'); process.exit(2) }
+const p = preset(a.preset, a.size)
 const r = report(`HTML: ${target} → ${p.label}`)
 if (!p.tested) r.warn(`Preset "${p.name}" is NOT verified — check the platform's official docs`)
 

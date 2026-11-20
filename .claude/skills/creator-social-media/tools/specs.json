@@ -1,0 +1,232 @@
+{
+  "_note": "Pixel zones are for the canvas size given. 'safe' = where protected elements (text, logos, CTAs, faces, products) may go. 'crops' = how the platform crops the asset in other views (profile grid / feed). 'avoid' = UI overlays that cover the asset. tested=true: used and checked in real productions. tested=false: approximate — verify against official docs and tell the user the value is unverified. Last reviewed: 2026-11. 'source' says where estimated values come from. Any preset can be scaled to a same-ratio canvas with --size WxH.",
+
+  "reel-9x16": {
+    "label": "Vertical video (generic, measured in real productions). For platform versions use tiktok-9x16 / ig-reels-9x16 / fb-reels-9x16 / yt-shorts-9x16 / linkedin-9x16",
+    "w": 1080, "h": 1920, "tested": true,
+    "safe": { "x0": 60, "x1": 1020, "y0": 200, "y1": 1460 },
+    "avoid": [
+      { "name": "right action column (like/comment/share)", "x0": 940, "y0": 880, "x1": 1080, "y1": 1920 },
+      { "name": "top bar (tabs/search)", "x0": 0, "y0": 0, "x1": 1080, "y1": 200 },
+      { "name": "bottom caption/music/username", "x0": 0, "y0": 1460, "x1": 1080, "y1": 1920 }
+    ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "cover-9x16": {
+    "label": "Reel / TikTok / Facebook Reel / YouTube Shorts cover (thumbnail)",
+    "w": 1080, "h": 1920, "tested": true,
+    "safe": { "x0": 30, "x1": 1050, "y0": 290, "y1": 1620 },
+    "crops": [
+      { "name": "Instagram & TikTok profile grid 3:4", "x": 0, "y": 240, "w": 1080, "h": 1440 },
+      { "name": "Facebook/Instagram feed 4:5", "x": 0, "y": 285, "w": 1080, "h": 1350 }
+    ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "story-9x16": {
+    "label": "Instagram / Facebook Story",
+    "w": 1080, "h": 1920, "tested": true,
+    "safe": { "x0": 60, "x1": 1020, "y0": 250, "y1": 1580 },
+    "avoid": [
+      { "name": "top: progress bar + account name", "x0": 0, "y0": 0, "x1": 1080, "y1": 250 },
+      { "name": "bottom: reply field / stickers", "x0": 0, "y0": 1580, "x1": 1080, "y1": 1920 }
+    ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 },
+    "video": { "fps": [30], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "ig-feed-3x4": {
+    "label": "Instagram feed 3:4 (fills the profile grid tile exactly)",
+    "w": 1080, "h": 1440, "tested": true,
+    "safe": { "x0": 70, "x1": 1010, "y0": 70, "y1": 1370 },
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "ig-feed-4x5": {
+    "label": "Instagram / Facebook feed portrait",
+    "w": 1080, "h": 1350, "tested": true,
+    "safe": { "x0": 70, "x1": 1010, "y0": 60, "y1": 1290 },
+    "crops": [ { "name": "Instagram profile grid 3:4", "x": 34, "y": 0, "w": 1012, "h": 1350 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "ig-feed-1x1": {
+    "label": "Instagram / Facebook feed square",
+    "w": 1080, "h": 1080, "tested": true,
+    "safe": { "x0": 165, "x1": 915, "y0": 60, "y1": 1020 },
+    "crops": [ { "name": "Instagram profile grid 3:4 (cuts the sides!)", "x": 135, "y": 0, "w": 810, "h": 1080 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "yt-thumbnail": {
+    "label": "YouTube thumbnail (official recommendation 1280×720; larger 16:9 via --size 1920x1080 / 3840x2160, keep ≤ 2 MB)",
+    "w": 1280, "h": 720, "tested": true,
+    "safe": { "x0": 40, "x1": 1240, "y0": 40, "y1": 680 },
+    "avoid": [ { "name": "duration badge", "x0": 1100, "y0": 640, "x1": 1280, "y1": 720 } ],
+    "image": { "maxKB": 1024, "hardMaxKB": 2048 }
+  },
+
+  "yt-banner": {
+    "label": "YouTube channel banner (official safe area 1546×423)",
+    "w": 2560, "h": 1440, "tested": true,
+    "safe": { "x0": 507, "x1": 2053, "y0": 508, "y1": 931 },
+    "crops": [
+      { "name": "TV (full)", "x": 0, "y": 0, "w": 2560, "h": 1440 },
+      { "name": "desktop (max width)", "x": 0, "y": 508, "w": 2560, "h": 423 },
+      { "name": "mobile / min safe", "x": 507, "y": 508, "w": 1546, "h": 423 }
+    ],
+    "image": { "maxKB": 2048, "hardMaxKB": 6144 }
+  },
+
+  "fb-page-cover": {
+    "label": "Facebook Page cover (desktop vs mobile crop differ)",
+    "w": 1640, "h": 624, "tested": false,
+    "safe": { "x0": 250, "x1": 1390, "y0": 90, "y1": 534 },
+    "crops": [
+      { "name": "desktop (approx.)", "x": 0, "y": 0, "w": 1640, "h": 624 },
+      { "name": "mobile (approx., sides cut)", "x": 250, "y": 0, "w": 1140, "h": 624 }
+    ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "linkedin-banner": {
+    "label": "LinkedIn personal profile banner (profile photo overlaps bottom-left)",
+    "w": 1584, "h": 396, "tested": false,
+    "safe": { "x0": 420, "x1": 1500, "y0": 40, "y1": 356 },
+    "avoid": [ { "name": "profile photo (desktop, approx.)", "x0": 0, "y0": 170, "x1": 420, "y1": 396 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "x-header": {
+    "label": "X (Twitter) header",
+    "w": 1500, "h": 500, "tested": false,
+    "safe": { "x0": 60, "x1": 1440, "y0": 60, "y1": 360 },
+    "avoid": [ { "name": "profile photo (approx.)", "x0": 0, "y0": 300, "x1": 420, "y1": 500 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "tiktok-9x16": {
+    "label": "TikTok video / cover (platform-specific)",
+    "w": 1080, "h": 1920, "tested": false,
+    "source": "Estimate: third-party guidance 240 top / 660 bottom / 120 sides (TikTok publishes template files, not pixel values). Right action column measured in real productions.",
+    "safe": { "x0": 120, "x1": 960, "y0": 240, "y1": 1260 },
+    "avoid": [
+      { "name": "top bar (tabs/search)", "x0": 0, "y0": 0, "x1": 1080, "y1": 240 },
+      { "name": "bottom caption/music/username", "x0": 0, "y0": 1260, "x1": 1080, "y1": 1920 },
+      { "name": "right action column (like/comment/share)", "x0": 940, "y0": 880, "x1": 1080, "y1": 1920 }
+    ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "ig-reels-9x16": {
+    "label": "Instagram Reels video / cover (platform-specific, conservative)",
+    "w": 1080, "h": 1920, "tested": false,
+    "source": "Estimate: Meta Reels ads guidance 14% top / 35% bottom / 6% sides (269 / 672 / 65 px), as reported by third parties. Right action column measured in real productions.",
+    "safe": { "x0": 65, "x1": 1015, "y0": 269, "y1": 1248 },
+    "avoid": [
+      { "name": "top bar (Reels / camera)", "x0": 0, "y0": 0, "x1": 1080, "y1": 269 },
+      { "name": "bottom caption/username/audio", "x0": 0, "y0": 1248, "x1": 1080, "y1": 1920 },
+      { "name": "right action column (like/comment/share)", "x0": 940, "y0": 880, "x1": 1080, "y1": 1920 }
+    ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "fb-reels-9x16": {
+    "label": "Facebook Reels video (platform-specific)",
+    "w": 1080, "h": 1920, "tested": false,
+    "source": "Estimate: guidance ~217 top / ~415 bottom / 60–100 left / 150–180 right — conservative ends used.",
+    "safe": { "x0": 100, "x1": 900, "y0": 217, "y1": 1505 },
+    "avoid": [
+      { "name": "top bar", "x0": 0, "y0": 0, "x1": 1080, "y1": 217 },
+      { "name": "bottom caption/username", "x0": 0, "y0": 1505, "x1": 1080, "y1": 1920 },
+      { "name": "right action column", "x0": 900, "y0": 217, "x1": 1080, "y1": 1505 }
+    ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "yt-shorts-9x16": {
+    "label": "YouTube Shorts video (platform-specific)",
+    "w": 1080, "h": 1920, "tested": false,
+    "source": "Estimate: guidance 230–250 top / 350–420 bottom / 60 left / 190 right — conservative ends used.",
+    "safe": { "x0": 60, "x1": 890, "y0": 250, "y1": 1500 },
+    "avoid": [
+      { "name": "top bar (search/menu)", "x0": 0, "y0": 0, "x1": 1080, "y1": 250 },
+      { "name": "bottom title/channel/subscribe", "x0": 0, "y0": 1500, "x1": 1080, "y1": 1920 },
+      { "name": "right action column", "x0": 890, "y0": 250, "x1": 1080, "y1": 1500 }
+    ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "linkedin-9x16": {
+    "label": "LinkedIn vertical video (platform-specific)",
+    "w": 1080, "h": 1920, "tested": false,
+    "source": "Estimate: guidance 10% top/bottom, 5% sides.",
+    "safe": { "x0": 54, "x1": 1026, "y0": 192, "y1": 1728 },
+    "avoid": [
+      { "name": "top overlay", "x0": 0, "y0": 0, "x1": 1080, "y1": 192 },
+      { "name": "bottom overlay / controls", "x0": 0, "y0": 1728, "x1": 1080, "y1": 1920 }
+    ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
+  },
+
+  "video-16x9": {
+    "label": "Landscape video 16:9 — YouTube long-form / LinkedIn landscape video",
+    "w": 1920, "h": 1080, "tested": false,
+    "source": "Estimate: 10% top/bottom, 5% sides (LinkedIn video guidance); YouTube progress bar/controls sit at the bottom.",
+    "safe": { "x0": 96, "x1": 1824, "y0": 108, "y1": 972 },
+    "avoid": [ { "name": "player controls / progress bar", "x0": 0, "y0": 972, "x1": 1920, "y1": 1080 } ],
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 1024, "hardMaxMB": 4096 }
+  },
+
+  "feed-landscape": {
+    "label": "Instagram / Facebook landscape post (1080×566, ~1.91:1)",
+    "w": 1080, "h": 566, "tested": false,
+    "source": "Common platform size; 5% margins.",
+    "safe": { "x0": 54, "x1": 1026, "y0": 30, "y1": 536 },
+    "crops": [ { "name": "Instagram profile grid 3:4 (cuts most of the sides!)", "x": 328, "y": 0, "w": 424, "h": 566 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "link-preview": {
+    "label": "Facebook link preview / Open Graph image (1200×630)",
+    "w": 1200, "h": 630, "tested": false,
+    "source": "Common Open Graph size; 5% margins.",
+    "safe": { "x0": 60, "x1": 1140, "y0": 32, "y1": 598 },
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "linkedin-landscape": {
+    "label": "LinkedIn landscape post / link image (1200×627)",
+    "w": 1200, "h": 627, "tested": false,
+    "source": "Common LinkedIn size; 5% margins.",
+    "safe": { "x0": 60, "x1": 1140, "y0": 32, "y1": 595 },
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "linkedin-company-cover": {
+    "label": "LinkedIn Page (company) cover (4200×700 per LinkedIn Help; logo overlaps bottom-left)",
+    "w": 4200, "h": 700, "tested": false,
+    "source": "Dimensions: LinkedIn Help 'Image specifications for your LinkedIn Pages'. Logo position and mobile crop are approximate.",
+    "safe": { "x0": 840, "x1": 3780, "y0": 70, "y1": 630 },
+    "avoid": [ { "name": "page logo (approx.)", "x0": 0, "y0": 330, "x1": 760, "y1": 700 } ],
+    "crops": [ { "name": "mobile (approx., sides cut)", "x": 525, "y": 0, "w": 3150, "h": 700 } ],
+    "image": { "maxKB": 1024, "hardMaxKB": 3072 }
+  },
+
+  "yt-community-16x9": {
+    "label": "YouTube Community post, landscape (1280×720)",
+    "w": 1280, "h": 720, "tested": false,
+    "source": "Common size; 5% margins.",
+    "safe": { "x0": 64, "x1": 1216, "y0": 36, "y1": 684 },
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+
+  "yt-profile": {
+    "label": "YouTube profile picture (800×800, shown as a circle — keep content in the inscribed square)",
+    "w": 800, "h": 800, "tested": false,
+    "source": "Common size; circular display.",
+    "safe": { "x0": 117, "x1": 683, "y0": 117, "y1": 683 },
+    "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  }
+}

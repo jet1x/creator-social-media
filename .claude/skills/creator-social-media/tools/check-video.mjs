@@ -1,7 +1,8 @@
 // Video check (reel / story / short).
-//   node check-video.mjs <video.mp4> --preset <name> [--max-mb N] [--allow-cuts]
-// Checks: dimensions, fps, H.264, yuv420p, AAC, MP4, faststart, duration, file size, black frames,
-// flashes (sudden luminance jumps), hard cuts. Writes _qc/<name>-frames.png: frames with platform UI zones.
+//   node check-video.mjs <video.mp4> --preset <name> [--size WxH] [--fps 24,25,30] [--max-mb N] [--allow-cuts]
+// Checks: dimensions, fps, H.264, yuv420p, SDR/Rec.709, square pixels (SAR 1:1), progressive scan, AAC, MP4,
+// faststart, duration, file size, black frames, flashes (sudden luminance jumps), hard cuts.
+// Writes _qc/<name>-frames.png: opening frame, frames across the video and closing frame, with platform UI zones.
 import fs from 'node:fs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -9,10 +10,12 @@ import { args, preset, report, FFMPEG, sharp, overlaySVG, qcDir, fmtSize } from 
 
 const a = args()
 const file = a._[0]
-if (!file) { console.log('Usage: node check-video.mjs <video> --preset <name> [--max-mb N] [--allow-cuts]'); process.exit(2) }
-const p = preset(a.preset)
+if (!file) { console.log('Usage: node check-video.mjs <video> --preset <name> [--size WxH] [--fps 24,25,30] [--max-mb N] [--allow-cuts]'); process.exit(2) }
+const p = preset(a.preset, a.size)
 const r = report(`Video: ${path.basename(file)} → ${p.label}`)
-const v = p.video ?? { fps: [30], codec: 'h264', audio: 'aac', maxMB: 15, hardMaxMB: 25 }
+const v = { ...(p.video ?? { fps: [30], codec: 'h264', audio: 'aac', maxMB: 15, hardMaxMB: 25 }) }
+if (a.fps && a.fps !== true) v.fps = String(a.fps).split(',').map(Number)
+if (!p.tested) r.warn(`Preset "${p.name}" is NOT verified — safe zones are estimates; check the platform's official docs`)
 
 const info = spawnSync(FFMPEG, ['-hide_banner', '-i', file], { encoding: 'utf8' }).stderr
 const vs = /Stream #\S+.*Video: (\w+)(?: \(([^)]+)\))?[^,]*, (\w+)[^,]*,(?:[^,]*,)*? (\d+)x(\d+)/.exec(info)
@@ -26,6 +29,13 @@ else {
   ;+w === p.w && +h === p.h ? r.ok(`Dimensions ${w}×${h}`) : r.fail(`Dimensions ${w}×${h} — required ${p.w}×${p.h}`)
   codec === v.codec ? r.ok(`Codec ${codec}${profile ? ` (${profile})` : ''}`) : r.fail(`Codec ${codec} — required ${v.codec}`)
   pix === 'yuv420p' ? r.ok('Pixel format yuv420p') : r.fail(`Pixel format ${pix} — use yuv420p (otherwise it won't play everywhere)`)
+  const line = /Stream #\S+.*Video:.*/.exec(info)?.[0] ?? ''
+  const sar = /\[SAR (\d+):(\d+)/.exec(line)
+  !sar || sar[1] === sar[2] ? r.ok('Square pixels (SAR 1:1)') : r.fail(`SAR ${sar[1]}:${sar[2]} — pixels are not square; re-encode with -vf setsar=1`)
+  ;/(top|bottom)( coded)? first/.test(line) ? r.fail('Interlaced video — export progressive') : r.ok('Progressive scan')
+  if (/bt2020|smpte2084|arib-std-b67/.test(line)) r.fail('HDR / BT.2020 — export SDR Rec.709 (platforms tone-map HDR unpredictably)')
+  else if (/bt709/.test(line)) r.ok('SDR Rec.709')
+  else r.warn('Colour space not tagged — encode with -colorspace bt709 -color_primaries bt709 -color_trc bt709 (compress.mjs does this)')
 }
 v.fps.some((f) => Math.abs(f - fps) < 0.05) ? r.ok(`${fps} fps`) : r.fail(`${fps} fps — expected ${v.fps.join(' or ')}`)
 ;/Audio: aac/.test(info) ? r.ok('AAC audio') : /Audio:/.test(info) ? r.fail('Audio is not AAC') : r.warn('No audio track — add silent AAC or music')
@@ -55,19 +65,20 @@ if (cuts.length) (a['allow-cuts'] ? r.warn : r.fail)(`Hard cuts: ${cuts.map((c) 
 else r.ok('No hard cuts')
 
 // frame sheet with UI zones
+// opening frame (= preview frame) + 6 frames across + closing frame
 const N = 8
 const frames = []
 for (let i = 0; i < N; i++) {
-  const t = Math.min(dur - 0.05, (dur * (i + 0.5)) / N)
+  const t = i === 0 ? 0 : i === N - 1 ? Math.max(0, dur - 0.05) : (dur * i) / (N - 1)
   const out = spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-ss', String(t), '-i', file, '-frames:v', '1', '-f', 'image2pipe', '-vcodec', 'png', '-'], { maxBuffer: 1 << 27 })
   if (!out.stdout?.length) continue
   const full = await sharp(out.stdout).resize(p.w, p.h, { fit: 'fill' }).composite([{ input: overlaySVG(p) }]).png().toBuffer()
-  frames.push({ t, buf: await sharp(full).resize({ height: 640 }).png().toBuffer() })
+  frames.push({ t, tag: i === 0 ? 'OPEN ' : i === N - 1 ? 'END ' : '', buf: await sharp(full).resize({ height: 640 }).png().toBuffer() })
 }
 if (frames.length) {
   const fw = Math.round((640 * p.w) / p.h)
   const W = frames.length * (fw + 12) + 12
-  const labels = frames.map((fr, i) => `<text x="${12 + i * (fw + 12)}" y="30" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#fff">${fr.t.toFixed(1)}s</text>`).join('')
+  const labels = frames.map((fr, i) => `<text x="${12 + i * (fw + 12)}" y="30" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#fff">${fr.tag}${fr.t.toFixed(1)}s</text>`).join('')
   const comps = [{ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="40">${labels}</svg>`), left: 0, top: 0 }]
   frames.forEach((fr, i) => comps.push({ input: fr.buf, left: 12 + i * (fw + 12), top: 44 }))
   const sheet = path.join(qcDir(file), `${path.parse(file).name}-frames.png`)
