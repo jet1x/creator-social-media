@@ -184,7 +184,8 @@ When someone opens a profile or page, the cover must look complete:
 
 **Rules proven in real productions:**
 - **No flashes:** avoid luminance jumps > 9 (YAVG) between frames. Fast white objects, screens turning on, and glow sweeps across large flat surfaces cause them.
-- **Music:** deliver with a silent AAC track; the user adds trending or licensed audio inside the app. Never embed copyrighted music.
+- **Music:** deliver two files: one with licensed or royalty-free music (and the sound effects), and a `-no-music` version (silent AAC, or only the voice/key effects) so the user can add trending audio inside the app. Never embed copyrighted music.
+- **Audio levels:** check every delivered video with `tools/check-audio.mjs`: voice and important effects must stand out over the music (`--events`), no clipping, true peak ≤ −1 dBTP, end the mix with a limiter at ≈ −2.5 dBFS (AAC overshoots on transients).
 - **Readable on a phone:** body text ≥ 34 px and headlines ≥ 70 px at 1080 px wide, on screen for ≥ 1.5 s.
 - Check transitions, intro and outro safe zones, and subtitle positioning throughout.
 

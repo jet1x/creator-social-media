@@ -228,5 +228,14 @@
     "source": "Common size; circular display.",
     "safe": { "x0": 117, "x1": 683, "y0": 117, "y1": 683 },
     "image": { "maxKB": 500, "hardMaxKB": 1024 }
+  },
+  "linkedin-4x5": {
+    "label": "LinkedIn portrait video / image 4:5 (1080×1350)",
+    "w": 1080, "h": 1350, "tested": false,
+    "source": "Estimate: LinkedIn video guidance 10% top/bottom, 5% sides; feed controls sit at the bottom.",
+    "safe": { "x0": 54, "x1": 1026, "y0": 135, "y1": 1215 },
+    "avoid": [ { "name": "player controls", "x0": 0, "y0": 1215, "x1": 1080, "y1": 1350 } ],
+    "image": { "maxKB": 500, "hardMaxKB": 1024 },
+    "video": { "fps": [30, 60], "codec": "h264", "audio": "aac", "maxMB": 15, "hardMaxMB": 25 }
   }
 }

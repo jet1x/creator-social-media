@@ -21,7 +21,7 @@ Write naturally, confidently and conversationally. Vary sentence structure and v
 - Full links work here.
 
 ### Instagram (Reels discovery, shares and saves, Explore, search)
-- A first line that makes people tap "more" (only about 125 characters show).
+- A first line that makes people tap "more" (only about 125 characters show). **For a Reel whose video already carries the hook, line 1 is the ask** (comment the keyword, send it to someone, save it), not a second hook competing with the video; the context and search words follow.
 - SEO keywords worked naturally into the caption; Instagram search reads captions.
 - 3–5 hashtags (**max 5**).
 - A natural CTA aimed at saves, shares or comments.

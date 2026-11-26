@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
 import { FFMPEG, sharp } from '../lib.mjs'
 
 const TOOLS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'cropproof-test-'))
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'social-ready-test-'))
 const FIX = path.join(TOOLS, 'test', 'fixtures')
 let failed = 0
 
@@ -68,6 +68,17 @@ const flash = path.join(TMP, 'flash.mp4')
 spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=0x2a5a3a:s=1080x1920:d=1:r=30', '-f', 'lavfi', '-i', 'color=c=white:s=1080x1920:d=1:r=30',
   '-filter_complex', '[0][1]concat=n=2:v=1[v]', '-map', '[v]', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', flash])
 run('check-video: flash / hard cut / missing audio are caught', 'check-video.mjs', [flash, '--preset', 'reel-9x16'], { result: 'FAIL', contains: ['Flashes', 'No audio track'] })
+
+// --- audio ---
+const tone = (name, expr, codec = 'pcm_s16le') => { const f = path.join(TMP, name); spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', `aevalsrc=${expr}:s=48000:d=4:c=stereo`, '-c:a', codec, f]); return f }
+const goodMix = tone('mix-good.wav', '0.12*sin(2*PI*220*t)+if(between(t\\,2\\,2.4)\\,0.5*sin(2*PI*880*t)\\,0)')
+run('check-audio: clean mix with an audible cue passes', 'check-audio.mjs', [goodMix, '--events', '2:beep'], { result: 'PASS', contains: ['No clipping', 'beep @ 2.00s stands out'] })
+const buried = tone('mix-buried.wav', '0.3*sin(2*PI*220*t)+if(between(t\\,2\\,2.4)\\,0.02*sin(2*PI*880*t)\\,0)')
+run('check-audio: a sound effect buried under the music is caught', 'check-audio.mjs', [buried, '--events', '2:bonk'], { result: 'FAIL', contains: ['bonk @ 2.00s: buried'] })
+const clipped = tone('take-clipped.wav', '1.6*sin(2*PI*220*t)')
+run('check-audio: a clipped recording is caught', 'check-audio.mjs', [clipped, '--source'], { result: 'FAIL', contains: ['Clipped'] })
+const stereoOk = tone('stereo-loud-ok.wav', '0.7*sin(2*PI*220*t)')
+run('check-audio: loud but clean stereo is not reported as clipped (no channel summing)', 'check-audio.mjs', [stereoOk, '--source'], { result: 'PASS', contains: ['No clipping'] })
 
 fs.rmSync(TMP, { recursive: true, force: true })
 console.log(failed ? `\n${failed} test(s) FAILED` : '\nAll tests passed ✓')

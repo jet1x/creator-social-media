@@ -1,8 +1,10 @@
-# CropProof
+# Social Ready
+
+*(formerly Social Ready / social-ready)*
 
 **Social media design & QA skill for Claude — nothing gets cropped, nothing hides behind the buttons.**
 
-CropProof turns Claude into a social media designer, art director and copywriter that **measures** its own work before delivering it: exact platform sizes, safe zones, profile-grid and feed crops, video checks and small file sizes — for Instagram, TikTok, Facebook, YouTube, LinkedIn and X.
+Social Ready turns Claude into a social media designer, art director and copywriter that **measures** its own work before delivering it: exact platform sizes, safe zones, profile-grid and feed crops, video checks and small file sizes — for Instagram, TikTok, Facebook, YouTube, LinkedIn and X.
 
 > A beautiful design that gets cropped when uploaded is a failed design.
 > A correctly sized design with text hidden behind the like button is a failed design too.
@@ -15,12 +17,13 @@ CropProof turns Claude into a social media designer, art director and copywriter
 
 ## Why
 
-Most social media skills write posts. CropProof also **checks** them, with real measurements instead of "looks fine to me":
+Most social media skills write posts. Social Ready also **checks** them, with real measurements instead of "looks fine to me":
 
 - **One concept, a real version per platform**: never a plain resize. Each platform (TikTok, Instagram, Facebook, LinkedIn, YouTube, X) gets its own adapted layout, its own safe zone, its own export folder and its own description.
 - **Measured safe zones** — positions of headlines, logos and CTAs are measured in the rendered design (static *and* animated, every 0.1 s), not eyeballed.
 - **Crop previews** — see the asset exactly as the Instagram/TikTok grid (3:4) and the feed (4:5) will show it.
 - **Video QA**: dimensions, fps, H.264/yuv420p/AAC/MP4/faststart, SDR Rec.709, square pixels, progressive scan, black frames, flashes (sudden brightness jumps), hard cuts, and the opening and closing frames.
+- **Audio QA**: loudness, true peak, clipping or a distorted voice take, a quiet ending, silent gaps, and whether each sound effect or line actually stands out over the music (`--events`).
 - **Safe-zone overlays**: transparent PNG reference layers for TikTok, Instagram Reels, Facebook Reels, LinkedIn and YouTube Shorts, to use while editing in Photoshop, Figma, Premiere or CapCut.
 - **Small files, same look** — videos ≤ 15 MB and images ≤ 500 KB, with SSIM quality measurement (e.g. 58 MB → 10 MB, SSIM 0.976).
 - **Human copy** — separate captions per platform, current hashtag rules (Instagram: max 5), no invented claims, no "unleash / elevate / next level".
@@ -31,30 +34,30 @@ Most social media skills write posts. CropProof also **checks** them, with real 
 
 Requirements: [Claude Code](https://claude.com/claude-code), Node.js ≥ 20, git.
 
-The skill lives in [`.claude/skills/creator-social-media`](.claude/skills/creator-social-media). Skill URL for importers:
-`https://github.com/jet1x/CropProof/tree/main/.claude/skills/creator-social-media`
+The skill lives in [`.claude/skills/social-ready`](.claude/skills/social-ready). Skill URL for importers:
+`https://github.com/jet1x/social-ready/tree/main/.claude/skills/social-ready`
 
 **macOS / Linux** — install for all your projects
 ```bash
-git clone https://github.com/jet1x/CropProof.git
-mkdir -p ~/.claude/skills && cp -r CropProof/.claude/skills/creator-social-media ~/.claude/skills/
-cd ~/.claude/skills/creator-social-media/tools
+git clone https://github.com/jet1x/social-ready.git
+mkdir -p ~/.claude/skills && cp -r social-ready/.claude/skills/social-ready ~/.claude/skills/
+cd ~/.claude/skills/social-ready/tools
 npm install && npm run setup && npm test
 ```
 
 **Windows (PowerShell)** — install for all your projects
 ```powershell
-git clone https://github.com/jet1x/CropProof.git
+git clone https://github.com/jet1x/social-ready.git
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
-Copy-Item -Recurse CropProof\.claude\skills\creator-social-media "$HOME\.claude\skills\"
-cd "$HOME\.claude\skills\creator-social-media\tools"
+Copy-Item -Recurse social-ready\.claude\skills\social-ready "$HOME\.claude\skills\"
+cd "$HOME\.claude\skills\social-ready\tools"
 npm install; npm run setup; npm test
 ```
 
-**One project only:** copy `.claude/skills/creator-social-media` into `<your-project>/.claude/skills/`, then run the same `npm` commands in its `tools/` folder.
+**One project only:** copy `.claude/skills/social-ready` into `<your-project>/.claude/skills/`, then run the same `npm` commands in its `tools/` folder.
 
 - `npm run setup` downloads the headless Chromium used for measuring HTML designs.
-- `npm test` runs the self-test (14 checks: correct assets must pass, deliberately broken ones must fail).
+- `npm test` runs the self-test (18 checks: correct assets must pass, deliberately broken ones must fail).
 - The tools use `sharp`, `playwright` and `ffmpeg-static` (~110 MB in `tools/node_modules`). If your npm blocks install scripts and ffmpeg is missing, run `npm rebuild ffmpeg-static`, or set `FFMPEG_PATH` to your own ffmpeg.
 
 ## Use
@@ -67,19 +70,20 @@ Create a YouTube thumbnail and a LinkedIn post for my case study.
 Check this cover before I upload it: ./cover.png
 ```
 
-Or call it directly with `/creator-social-media`.
+Or call it directly with `/social-ready`.
 
 Claude will: ask which platforms you want (unless you named them) → identify placements → verify specs → design → **run the measuring tools and fix until everything passes** → review the QC sheets → compress → deliver one folder per platform (assets + `caption.md`) with a QC report, plus the full copy package and publishing strategy.
 
 ## Tools
 
-Run from `.claude/skills/creator-social-media/tools/` (Claude runs them for you; you can too):
+Run from `.claude/skills/social-ready/tools/` (Claude runs them for you; you can too):
 
 | Command | What it does |
 |---|---|
 | `node check-html.mjs <design.html> --preset <p> [--size WxH] [--step 0.1]` | Measures protected elements in an HTML design (static or animated) vs safe zone, UI overlays, clipping, obstacles |
 | `node check-image.mjs <image> --preset <p> [--size WxH]` | Dimensions, format, sRGB, file size + crop/safe-zone sheet in `_qc/` |
 | `node check-video.mjs <video.mp4> --preset <p> [--size WxH] [--fps 30,60]` | Specs (incl. Rec.709, SAR 1:1, progressive), size, black frames, flashes, hard cuts, plus a frame sheet (opening to closing frame) with UI zones |
+| `node check-audio.mjs <file> [--events "9.6:bonk,7.0:phone"] [--timeline] [--source]` | Loudness, true peak, clipping/distortion, quiet ending, silent gaps, and whether each listed sound stands out; `--source` checks a raw voice take before it goes into a mix |
 | `node compress.mjs <file> [--max-mb 15 \| --max-kb 500]` | Compresses with quality measurement; never overwrites the original |
 | `node make-overlays.mjs [--preset a,b \| --all] [--size WxH]` | Transparent safe-zone overlay PNGs; by default the five 9:16 platform overlays in `overlays/` |
 
@@ -126,7 +130,7 @@ Every tool prints ✓ / ⚠ / ✗ and `RESULT: PASS | FAIL` (exit code 1 on FAIL
 ## What's inside
 
 ```
-.claude/skills/creator-social-media/
+.claude/skills/social-ready/
 ├── SKILL.md            the protocol + workflow + checklist (loaded with the skill)
 ├── platform-specs.md   dimensions per platform, safe zones, multi-platform adaptation, covers, video QC, overlays
 ├── copywriting.md      per-platform deliverables, hashtag research, limits, human tone, CTA rules
