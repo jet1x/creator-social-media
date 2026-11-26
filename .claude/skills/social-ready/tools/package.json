@@ -1,9 +1,9 @@
 {
-  "name": "cropproof-tools",
+  "name": "social-ready-tools",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Measured QA + compression tools for the CropProof social media skill",
+  "description": "Measured QA + compression tools for the Social Ready skill",
   "license": "MIT",
   "engines": { "node": ">=20" },
   "scripts": {
