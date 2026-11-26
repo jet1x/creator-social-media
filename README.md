@@ -1,6 +1,6 @@
 # Social Ready
 
-*(formerly Social Ready / social-ready)*
+*(formerly CropProof / creator-social-media)*
 
 **Social media design & QA skill for Claude — nothing gets cropped, nothing hides behind the buttons.**
 
