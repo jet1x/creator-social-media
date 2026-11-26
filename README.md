@@ -2,12 +2,23 @@
 
 *(formerly CropProof / creator-social-media)*
 
+![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Node ≥ 20](https://img.shields.io/badge/node-%E2%89%A5%2020-339933) ![Self-test: 18 checks](https://img.shields.io/badge/self--test-18%20checks%20passing-brightgreen) ![Platforms](https://img.shields.io/badge/platforms-IG%20%C2%B7%20TikTok%20%C2%B7%20FB%20%C2%B7%20YouTube%20%C2%B7%20LinkedIn%20%C2%B7%20X-8957e5)
+
 **Social media design & QA skill for Claude — nothing gets cropped, nothing hides behind the buttons.**
 
 Social Ready turns Claude into a social media designer, art director and copywriter that **measures** its own work before delivering it: exact platform sizes, safe zones, profile-grid and feed crops, video checks and small file sizes — for Instagram, TikTok, Facebook, YouTube, LinkedIn and X.
 
 > A beautiful design that gets cropped when uploaded is a failed design.
 > A correctly sized design with text hidden behind the like button is a failed design too.
+
+## See it catch a real mistake
+
+![Before: the CTA sits under TikTok's caption area, FAIL. After: moved into the safe zone, PASS](assets/before-after.png)
+*Real `check-html.mjs` output on a demo reel: the "Link in bio" button sat at y 1640, under TikTok's caption, so the check failed; moved into the safe zone, it passed.*
+
+<p align="center"><img src="assets/fix-loop.gif" width="360" alt="Design, measured against TikTok's UI (FAIL), fixed, measured again (PASS)"></p>
+
+*The loop the skill runs on every asset: design → measure → fix → measure again → only then deliver.*
 
 ![QC sheet: full cover with safe zone, Instagram/TikTok grid crop, feed crop](assets/qc-cover-sheet.jpg)
 *`check-image.mjs` output: the full cover with the safe zone, then exactly what the profile grid (3:4) and the feed (4:5) will show.*
@@ -74,6 +85,29 @@ Or call it directly with `/social-ready`.
 
 Claude will: ask which platforms you want (unless you named them) → identify placements → verify specs → design → **run the measuring tools and fix until everything passes** → review the QC sheets → compress → deliver one folder per platform (assets + `caption.md`) with a QC report, plus the full copy package and publishing strategy.
 
+### What you get
+
+Ask once, for example:
+
+```
+Make a 10-second reel for TikTok, Instagram and Facebook announcing our Black Friday sale, with captions.
+```
+
+and you get one folder per platform, each version adapted and checked against that platform's own safe zones:
+
+```
+black-friday/
+├── tiktok/
+│   ├── reel-tiktok-1080x1920.mp4            ≤ 15 MB, measured, no flashes, audio checked
+│   ├── reel-tiktok-1080x1920-no-music.mp4   for trending audio added in the app
+│   ├── reel-tiktok-cover-1080x1920.jpg
+│   └── caption.md                           caption, hashtags, pinned comment
+├── instagram/                               same set, Instagram Reels safe zones
+├── facebook/                                same set, text kept clear of the right action column
+├── _master/                                 high-quality masters
+└── captions.md                              research, analysis, publishing strategy, sources
+```
+
 ## Tools
 
 Run from `.claude/skills/social-ready/tools/` (Claude runs them for you; you can too):
@@ -90,6 +124,16 @@ Run from `.claude/skills/social-ready/tools/` (Claude runs them for you; you can
 `--size WxH` scales any preset proportionally to a canvas with the same ratio (e.g. a 3840×2160 thumbnail).
 
 Every tool prints ✓ / ⚠ / ✗ and `RESULT: PASS | FAIL` (exit code 1 on FAIL), so it fits in scripts and CI.
+
+### Audio check
+
+![check-audio.mjs: a sound effect buried under the music fails, the raised one passes](assets/audio-check.png)
+*`check-audio.mjs --events "2.5:bonk"` on two demo mixes: the effect is measured against the 1.5 s before it. It also catches clipped or distorted voice takes (`--source`), a true peak over −1 dBTP and an ending that gets lost.*
+
+### Safe-zone overlays
+
+![The five 9:16 safe-zone overlays: TikTok, Instagram Reels, Facebook Reels, YouTube Shorts, LinkedIn](assets/overlays.png)
+*`overlays/` ships these as transparent PNGs to drop on top of a timeline in Premiere, CapCut, Figma or Photoshop. Values are estimates, not official platform specs.*
 
 ### HTML contract (for exact measurements)
 - `data-check` on protected elements (headline, logo, CTA, URL…)
